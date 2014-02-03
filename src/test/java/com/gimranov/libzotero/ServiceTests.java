@@ -83,7 +83,7 @@ public class ServiceTests {
 
                 return null;
             }
-        })).first().size() > 0);
+        })).first().size() == 1);
     }
 
     @Test
