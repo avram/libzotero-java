@@ -25,11 +25,16 @@ import org.junit.Test;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
+import retrofit.client.Header;
+import retrofit.client.Response;
+import rx.Observable;
 import rx.observables.BlockingObservable;
+import rx.util.functions.Action1;
 import rx.util.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.gimranov.libzotero.Credentials.ACCESS_KEY;
 import static com.gimranov.libzotero.Credentials.USER_ID;
@@ -81,6 +86,20 @@ public class ServiceTests {
                 return null;
             }
         })).first().size() == 1);
+    }
+
+    @Test
+    public void testItemListWithFlatMap() throws Exception {
+        Item item = zoteroService.getItems(LibraryType.USER, USER_ID, null, null)
+                .flatMap(new Func1<List<Item>, Observable<Item>>() {
+                    @Override
+                    public Observable<Item> call(List<Item> response) {
+                        return Observable.from(response);
+                    }
+                })
+                .toBlockingObservable().first();
+
+        assertNotNull(item);
     }
 
     @Test
@@ -140,5 +159,30 @@ public class ServiceTests {
 
         assertTrue(privileges.hasLibrary());
 
+    }
+
+    @Test
+    public void testResponseHeader() throws Exception {
+        assertEquals(new Integer(1), zoteroService.getItemsNotAsAList(LibraryType.USER, USER_ID, null, null)
+                .flatMap(new Func1<Response, Observable<Header>>() {
+                    @Override
+                    public Observable<Header> call(Response response) {
+                        return Observable.from(response.getHeaders());
+                    }
+                })
+                .filter(new Func1<Header, Boolean>() {
+                    @Override
+                    public Boolean call(Header header) {
+                        return "Last-Modified-Version".equalsIgnoreCase(header.getName());
+                    }
+                })
+                .map(new Func1<Header, Integer>() {
+                    @Override
+                    public Integer call(Header header) {
+                        return Integer.valueOf(header.getValue());
+                    }
+                })
+                .toBlockingObservable()
+                .first());
     }
 }

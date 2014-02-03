@@ -21,6 +21,7 @@ package com.gimranov.libzotero;
 
 import com.gimranov.libzotero.model.*;
 import org.jetbrains.annotations.Nullable;
+import retrofit.client.Response;
 import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.Path;
@@ -39,6 +40,18 @@ public interface ZoteroService {
      */
     @GET("/{type}/{id}/items?content=json")
     Observable<List<Item>> getItems(@Path("type") LibraryType type,
+                                    @Path("id") long id,
+                                    @Nullable @QueryMap SearchQuery searchQuery,
+                                    @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
+
+
+    /**
+     * The set of all items in the library
+     *
+     * @param searchQuery Search parameters for the result set. May be null to apply no search parameters
+     */
+    @GET("/{type}/{id}/items?content=json")
+    Observable<Response> getItemsNotAsAList(@Path("type") LibraryType type,
                                     @Path("id") long id,
                                     @Nullable @QueryMap SearchQuery searchQuery,
                                     @Nullable @Header("If-Modified-Since-Version") String libraryVersion);

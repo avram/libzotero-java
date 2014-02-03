@@ -21,6 +21,8 @@ package com.gimranov.libzotero;
 
 import com.gimranov.libzotero.model.Item;
 import com.gimranov.libzotero.persist.PersistenceAction;
+import com.gimranov.libzotero.rx.FlattenIteratorFunc;
+import com.gimranov.libzotero.rx.PersistenceLoadFunc;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,26 +85,18 @@ public class FetchAndStoreTests {
 
     @Test
     public void testUse304() throws Exception {
-        Observable<List<Item>> itemObservable = zoteroService.getItems(LibraryType.USER, Credentials.USER_ID, null, null);
-        Observable<List<Item>> cachingObservable = itemObservable.doOnNext(new PersistenceAction(persistence));
+        PersistenceAction persistenceAction = new PersistenceAction(persistence);
+        Observable<List<Item>> itemObservable = zoteroService.getItems(LibraryType.USER, Credentials.USER_ID, null, null)
+                .doOnNext(persistenceAction);
 
         // Make the request and persist it all
-        List<Item> results = BlockingObservable.from(cachingObservable).first();
+        List<Item> results = BlockingObservable.from(itemObservable).first();
 
-        Observable<List<Item>> recoveringObservable = zoteroService.getItems(LibraryType.USER, Credentials.USER_ID, null, "1000")
-                .onErrorResumeNext(new Func1<Throwable, Observable<? extends List<Item>>>() {
-                    @Override
-                    public Observable<? extends List<Item>> call(Throwable throwable) {
-                        if (throwable instanceof RetrofitError) {
-                            if (((RetrofitError) throwable).getResponse().getStatus() == 304) {
-                                return persistence.load(Item.class).toList();
-                            }
-                        }
-                        return null;
-                    }
-                });
+        Observable<Item> recoveringObservable = zoteroService.getItems(LibraryType.USER, Credentials.USER_ID, null, "1000")
+                .flatMap(new FlattenIteratorFunc<Item>())
+                .onErrorResumeNext(new PersistenceLoadFunc<>(Item.class, persistence));
 
-        List<Item> cachedResults = recoveringObservable.toBlockingObservable().first();
+        List<Item> cachedResults = recoveringObservable.toList().toBlockingObservable().first();
 
         assertFalse(cachedResults.isEmpty());
         assertEquals(results.size(), cachedResults.size());
