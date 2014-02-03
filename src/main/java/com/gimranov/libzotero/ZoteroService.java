@@ -34,6 +34,7 @@ public interface ZoteroService {
 
     /**
      * The set of all items in the library
+     *
      * @param searchQuery Search parameters for the result set. May be null to apply no search parameters
      */
     @GET("/{type}/{id}/items?content=json")
@@ -194,5 +195,5 @@ public interface ZoteroService {
      */
     @GET("/users/{id}/keys/{key}?content=json")
     Observable<Privilege> getPrivileges(@Path("id") long id,
-                                              @Path("key") String key);
+                                        @Path("key") String key);
 }

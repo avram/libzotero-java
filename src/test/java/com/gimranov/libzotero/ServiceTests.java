@@ -22,10 +22,14 @@ package com.gimranov.libzotero;
 import com.gimranov.libzotero.model.*;
 import org.junit.Before;
 import org.junit.Test;
+import retrofit.ErrorHandler;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 import rx.observables.BlockingObservable;
+import rx.util.functions.Func1;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -63,6 +67,24 @@ public class ServiceTests {
         assertTrue(BlockingObservable.from(itemObservable).first().size() > 0);
     }
 
+    @Test
+    public void testItemList304() throws Exception {
+        rx.Observable<List<Item>> itemObservable = zoteroService.getItems(LibraryType.USER, USER_ID, null, "10000");
+        assertTrue(BlockingObservable.from(itemObservable.onErrorReturn(new Func1<Throwable, List<Item>>() {
+            @Override
+            public List<Item> call(Throwable throwable) {
+                if (throwable instanceof RetrofitError) {
+                    if (((RetrofitError) throwable).getResponse().getStatus() == 304) {
+                        List<Item> existing = new ArrayList<>();
+                        existing.add(new Item());
+                        return existing;
+                    }
+                }
+
+                return null;
+            }
+        })).first().size() > 0);
+    }
 
     @Test
     public void testItemVersions() throws Exception {
@@ -92,6 +114,14 @@ public class ServiceTests {
     @Test
     public void testSingleItem() throws Exception {
         rx.Observable<Item> itemObservable = zoteroService.getItem(LibraryType.USER, USER_ID, "EVZNKA2M", null);
+        Item bill = BlockingObservable.from(itemObservable).first();
+        assertEquals(1, bill.getItemVersion());
+        assertEquals("journalArticle", bill.getItemType());
+    }
+
+    @Test
+    public void testSingleItem304() throws Exception {
+        rx.Observable<Item> itemObservable = zoteroService.getItem(LibraryType.USER, USER_ID, "EVZNKA2M", "1");
         Item bill = BlockingObservable.from(itemObservable).first();
         assertEquals(1, bill.getItemVersion());
         assertEquals("journalArticle", bill.getItemType());
