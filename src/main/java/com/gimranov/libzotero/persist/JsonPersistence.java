@@ -27,6 +27,8 @@ import rx.Observer;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 
+import java.util.Map;
+
 public abstract class JsonPersistence implements IPersistence {
 
     protected abstract String get(String key, String store);
@@ -35,9 +37,18 @@ public abstract class JsonPersistence implements IPersistence {
 
     private Gson gson = new GsonBuilder().create();
 
+    protected <T> T deserialize(String serialized, Class<T> tClass) {
+        return gson.fromJson(serialized, tClass);
+    }
+
+    protected <T> String serialize(T item) {
+        return gson.toJson(item);
+    }
+
+
     @Override
     public <T> void persist(String itemKey, T item) {
-        put(itemKey, gson.toJson(item), item.getClass().getSimpleName());
+        put(itemKey, serialize(item), item.getClass().getSimpleName());
     }
 
     @Override
@@ -50,12 +61,19 @@ public abstract class JsonPersistence implements IPersistence {
                 if (value == null) {
                     observer.onError(new ItemNotFoundException());
                 } else {
-                    observer.onNext(gson.fromJson(value, tClass));
+                    observer.onNext(deserialize(value, tClass));
                     observer.onCompleted();
                 }
                 return Subscriptions.empty();
             }
         });
+    }
+
+    @Override
+    public <T> void persist(Map<String, T> items) {
+        for (Map.Entry<String, T> entry : items.entrySet()) {
+            persist(entry.getKey(), entry.getValue());
+        }
     }
 
     @Override

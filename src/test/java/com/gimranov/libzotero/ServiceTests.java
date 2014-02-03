@@ -22,7 +22,6 @@ package com.gimranov.libzotero;
 import com.gimranov.libzotero.model.*;
 import org.junit.Before;
 import org.junit.Test;
-import retrofit.ErrorHandler;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -32,15 +31,13 @@ import rx.util.functions.Func1;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.gimranov.libzotero.Credentials.ACCESS_KEY;
+import static com.gimranov.libzotero.Credentials.USER_ID;
 import static org.junit.Assert.*;
 
 public class ServiceTests {
 
     ZoteroService zoteroService;
-
-    // Credentials of the Zandy user.
-    private static final int USER_ID = 743083;
-    private static final String ACCESS_KEY = "vLLtTQU1tcWCPb3Grsl6GzWi";
 
     @Before
     public void setUp() throws Exception {

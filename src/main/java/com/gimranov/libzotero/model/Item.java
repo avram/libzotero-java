@@ -23,7 +23,9 @@ package com.gimranov.libzotero.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Item {
+public class Item implements Identifiable {
+
+    private String itemKey;
 
     private String itemType;
 
@@ -76,6 +78,15 @@ public class Item {
     private String extra;
     
     private List<Tag> tags = new ArrayList<Tag>();
+
+    @Override
+    public String getIdentifier() {
+        return itemKey;
+    }
+
+    public String getItemKey() {
+        return itemKey;
+    }
 
     public String getItemType() {
         return itemType;

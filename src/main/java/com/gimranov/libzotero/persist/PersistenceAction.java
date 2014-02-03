@@ -19,21 +19,24 @@
 
 package com.gimranov.libzotero.persist;
 
-import com.gimranov.libzotero.model.*;
-import rx.Observable;
+import com.gimranov.libzotero.model.Identifiable;
+import rx.util.functions.Action1;
 
 import java.util.List;
-import java.util.Map;
 
-public interface IPersistence {
-    public <T> void persist(String itemKey, T item);
-    public <T> void persist(Map<String, T> items);
-    public <T> Observable<T> load(String key, Class<T> tClass);
-    public <T> Observable<T> load(Class<T> tClass);
+public class PersistenceAction implements Action1<List> {
+    private IPersistence persistence;
 
-    public void persist(ObjectVersions objectVersions);
-    public Observable<Integer> loadItemVersion(String key);
+    public PersistenceAction(IPersistence persistence) {
+        this.persistence = persistence;
+    }
 
-    public void persistLibraryVersion(int libraryVersion);
-    public Observable<Integer> loadLibraryVersion();
+    @Override
+    public void call(List ts) {
+        for (Object identifiable : ts) {
+            if (identifiable instanceof Identifiable) {
+                persistence.persist(((Identifiable) identifiable).getIdentifier(), identifiable);
+            }
+        }
+    }
 }

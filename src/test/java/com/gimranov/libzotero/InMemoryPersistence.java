@@ -20,6 +20,8 @@
 package com.gimranov.libzotero;
 
 import com.gimranov.libzotero.persist.JsonPersistence;
+import rx.Observable;
+import rx.util.functions.Func1;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +39,16 @@ public class InMemoryPersistence extends JsonPersistence {
         getStore(store).put(key, value);
     }
 
+    @Override
+    public <T> Observable<T> load(final Class<T> tClass) {
+        return Observable.from(getStore(tClass.getSimpleName()).values()).map(new Func1<String, T>() {
+            @Override
+            public T call(String s) {
+                return deserialize(s, tClass);
+            }
+        });
+    }
+
     private Map<String, String> getStore(String name) {
         Map<String, String> map = store.get(name);
         if (map == null) {
@@ -45,5 +57,9 @@ public class InMemoryPersistence extends JsonPersistence {
         }
 
         return map;
+    }
+
+    public void clear() {
+        store.clear();
     }
 }
