@@ -59,14 +59,14 @@ public class ServiceTests {
 
     @Test
     public void testItemListLoad() throws Exception {
-        rx.Observable<List<Item>> itemObservable = zoteroService.getItems(LibraryType.USER, USER_ID, null);
+        rx.Observable<List<Item>> itemObservable = zoteroService.getItems(LibraryType.USER, USER_ID, null, null);
         assertTrue(BlockingObservable.from(itemObservable).first().size() > 0);
     }
 
 
     @Test
     public void testItemVersions() throws Exception {
-        rx.Observable<ObjectVersions> versionsObservable = zoteroService.getItemVersions(LibraryType.USER, USER_ID, null);
+        rx.Observable<ObjectVersions> versionsObservable = zoteroService.getItemVersions(LibraryType.USER, USER_ID, null, null);
         ObjectVersions versions = BlockingObservable.from(versionsObservable).first();
 
         Integer version = versions.getVersionForItem("EVZNKA2M");
@@ -76,13 +76,13 @@ public class ServiceTests {
 
     @Test
     public void testCollectionLoad() throws Exception {
-        rx.Observable<List<Collection>> collections = zoteroService.getCollections(LibraryType.USER, USER_ID);
+        rx.Observable<List<Collection>> collections = zoteroService.getCollections(LibraryType.USER, USER_ID, null);
         assertTrue(BlockingObservable.from(collections).first().size() > 0);
     }
 
     @Test
     public void testSearchList() throws Exception {
-        rx.Observable<List<Search>> searches = zoteroService.getSearches(LibraryType.USER, USER_ID);
+        rx.Observable<List<Search>> searches = zoteroService.getSearches(LibraryType.USER, USER_ID, null);
         List<Search> searchList = BlockingObservable.from(searches).first();
 
         // We have no searches on the test account right now
@@ -91,7 +91,7 @@ public class ServiceTests {
 
     @Test
     public void testSingleItem() throws Exception {
-        rx.Observable<Item> itemObservable = zoteroService.getItem(LibraryType.USER, USER_ID, "EVZNKA2M");
+        rx.Observable<Item> itemObservable = zoteroService.getItem(LibraryType.USER, USER_ID, "EVZNKA2M", null);
         Item bill = BlockingObservable.from(itemObservable).first();
         assertEquals(1, bill.getItemVersion());
         assertEquals("journalArticle", bill.getItemType());

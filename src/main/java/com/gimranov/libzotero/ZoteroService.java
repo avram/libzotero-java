@@ -22,6 +22,7 @@ package com.gimranov.libzotero;
 import com.gimranov.libzotero.model.*;
 import org.jetbrains.annotations.Nullable;
 import retrofit.http.GET;
+import retrofit.http.Header;
 import retrofit.http.Path;
 import retrofit.http.QueryMap;
 import rx.Observable;
@@ -38,12 +39,14 @@ public interface ZoteroService {
     @GET("/{type}/{id}/items?content=json")
     Observable<List<Item>> getItems(@Path("type") LibraryType type,
                                     @Path("id") long id,
-                                    @Nullable @QueryMap SearchQuery searchQuery);
+                                    @Nullable @QueryMap SearchQuery searchQuery,
+                                    @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     @GET("/{type}/{id}/items?format=versions")
     Observable<ObjectVersions> getItemVersions(@Path("type") LibraryType type,
                                                @Path("id") long id,
-                                               @Nullable @QueryMap Map searchQuery);
+                                               @Nullable @QueryMap Map searchQuery,
+                                               @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * The set of all top-level items in the library
@@ -51,7 +54,8 @@ public interface ZoteroService {
     @GET("/{type}/{id}/items/top?content=json")
     Observable<List<Item>> getTopLevelItems(@Path("type") LibraryType type,
                                             @Path("id") long id,
-                                            @Nullable @QueryMap Map searchQuery);
+                                            @Nullable @QueryMap Map searchQuery,
+                                            @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * The set of items in the trash
@@ -67,7 +71,8 @@ public interface ZoteroService {
     @GET("/{type}/{id}/items/{itemKey}?content=json")
     Observable<Item> getItem(@Path("type") LibraryType type,
                              @Path("id") long id,
-                             @Path("itemKey") String itemKey);
+                             @Path("itemKey") String itemKey,
+                             @Nullable @Header("If-Modified-Since-Version") String itemVersion);
 
     /**
      * The set of all child items under a specific item
@@ -90,7 +95,8 @@ public interface ZoteroService {
      */
     @GET("/{type}/{id}/tags?content=json")
     Observable<List<Item>> getTags(@Path("type") LibraryType type,
-                                   @Path("id") long id);
+                                   @Path("id") long id,
+                                   @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * The set of tags (i.e., of all types) matching a specific name
@@ -105,14 +111,16 @@ public interface ZoteroService {
      */
     @GET("/{type}/{id}/collections?content=json")
     Observable<List<Collection>> getCollections(@Path("type") LibraryType type,
-                                                @Path("id") long id);
+                                                @Path("id") long id,
+                                                @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * The set of all top-level collections in the library
      */
     @GET("/{type}/{id}/collections/top?content=json")
     Observable<List<Collection>> getTopLevelCollections(@Path("type") LibraryType type,
-                                                        @Path("id") long id);
+                                                        @Path("id") long id,
+                                                        @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * A specific collection in the library
@@ -137,7 +145,8 @@ public interface ZoteroService {
     Observable<List<Item>> getCollectionItems(@Path("type") LibraryType type,
                                               @Path("id") long id,
                                               @Path("collectionKey") String collectionKey,
-                                              @Nullable @QueryMap Map searchQuery);
+                                              @Nullable @QueryMap Map searchQuery,
+                                              @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * The set of top-level items within a specific collection in the library
@@ -146,7 +155,8 @@ public interface ZoteroService {
     Observable<List<Item>> getCollectionTopLevelitems(@Path("type") LibraryType type,
                                                       @Path("id") long id,
                                                       @Path("collectionKey") String collectionKey,
-                                                      @Nullable @QueryMap Map searchQuery);
+                                                      @Nullable @QueryMap Map searchQuery,
+                                                      @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * The set of tags within a specific collection in the library
@@ -161,7 +171,8 @@ public interface ZoteroService {
      */
     @GET("/{type}/{id}/searches?content=json")
     Observable<List<Search>> getSearches(@Path("type") LibraryType type,
-                                         @Path("id") long id);
+                                         @Path("id") long id,
+                                         @Nullable @Header("If-Modified-Since-Version") String libraryVersion);
 
     /**
      * A specific saved search in the library
