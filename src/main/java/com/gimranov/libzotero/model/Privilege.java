@@ -22,10 +22,6 @@ package com.gimranov.libzotero.model;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Part of the Scopely™ Platform
- * © 2013 Scopely, Inc.
- */
 public class Privilege {
 
     private boolean library;

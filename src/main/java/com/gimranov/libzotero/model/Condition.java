@@ -21,10 +21,6 @@ package com.gimranov.libzotero.model;
 
 import com.google.gson.annotations.Expose;
 
-/**
- * Part of the Scopely™ Platform
- * © 2013 Scopely, Inc.
- */
 public class Condition {
     private static final String TAG = Condition.class.getCanonicalName();
 

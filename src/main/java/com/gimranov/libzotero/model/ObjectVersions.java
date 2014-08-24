@@ -24,10 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
-/**
- * Part of the Scopely™ Platform
- * © 2013 Scopely, Inc.
- */
 public class ObjectVersions extends HashMap<String, Integer> {
 
     @Nullable

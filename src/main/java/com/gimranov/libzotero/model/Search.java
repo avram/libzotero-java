@@ -24,10 +24,6 @@ import com.google.gson.annotations.Expose;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Part of the Scopely™ Platform
- * © 2013 Scopely, Inc.
- */
 public class Search {
     private static final String TAG = Search.class.getCanonicalName();
 

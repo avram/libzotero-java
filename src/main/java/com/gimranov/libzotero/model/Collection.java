@@ -19,10 +19,6 @@
 
 package com.gimranov.libzotero.model;
 
-/**
- * Part of the Scopely™ Platform
- * © 2013 Scopely, Inc.
- */
 public class Collection {
     private static final String TAG = Collection.class.getCanonicalName();
 }
