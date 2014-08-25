@@ -22,7 +22,7 @@ package com.gimranov.libzotero.rx;
 import com.gimranov.libzotero.persist.IPersistence;
 import retrofit.RetrofitError;
 import rx.Observable;
-import rx.util.functions.Func1;
+import rx.functions.Func1;
 
 public class PersistenceLoadFunc<T> implements Func1<Throwable, Observable<T>> {
 

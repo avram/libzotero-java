@@ -20,7 +20,7 @@
 package com.gimranov.libzotero.persist;
 
 import com.gimranov.libzotero.model.Identifiable;
-import rx.util.functions.Action1;
+import rx.functions.Action1;
 
 import java.util.List;
 

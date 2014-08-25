@@ -19,7 +19,12 @@
 
 package com.gimranov.libzotero;
 
-import com.gimranov.libzotero.model.*;
+import com.gimranov.libzotero.model.Collection;
+import com.gimranov.libzotero.model.Group;
+import com.gimranov.libzotero.model.Item;
+import com.gimranov.libzotero.model.ObjectVersions;
+import com.gimranov.libzotero.model.Privilege;
+import com.gimranov.libzotero.model.Search;
 import org.junit.Before;
 import org.junit.Test;
 import retrofit.RequestInterceptor;
@@ -28,17 +33,17 @@ import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.client.Response;
 import rx.Observable;
+import rx.functions.Func1;
 import rx.observables.BlockingObservable;
-import rx.util.functions.Action1;
-import rx.util.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.gimranov.libzotero.Credentials.ACCESS_KEY;
 import static com.gimranov.libzotero.Credentials.USER_ID;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServiceTests {
 
@@ -97,7 +102,7 @@ public class ServiceTests {
                         return Observable.from(response);
                     }
                 })
-                .toBlockingObservable().first();
+                .toBlocking().first();
 
         assertNotNull(item);
     }
@@ -182,7 +187,7 @@ public class ServiceTests {
                         return Integer.valueOf(header.getValue());
                     }
                 })
-                .toBlockingObservable()
+                .toBlocking()
                 .first());
     }
 }

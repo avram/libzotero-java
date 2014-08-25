@@ -21,7 +21,7 @@ package com.gimranov.libzotero;
 
 import com.gimranov.libzotero.persist.JsonPersistence;
 import rx.Observable;
-import rx.util.functions.Func1;
+import rx.functions.Func1;
 
 import java.util.HashMap;
 import java.util.Map;

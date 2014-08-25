@@ -28,15 +28,16 @@ import org.junit.Before;
 import org.junit.Test;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
 import rx.Observable;
 import rx.observables.BlockingObservable;
-import rx.util.functions.Func1;
 
 import java.util.List;
 
 import static com.gimranov.libzotero.Credentials.ACCESS_KEY;
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 public class FetchAndStoreTests {
     private ZoteroService zoteroService;
@@ -96,7 +97,7 @@ public class FetchAndStoreTests {
                 .flatMap(new FlattenIteratorFunc<Item>())
                 .onErrorResumeNext(new PersistenceLoadFunc<>(Item.class, persistence));
 
-        List<Item> cachedResults = recoveringObservable.toList().toBlockingObservable().first();
+        List<Item> cachedResults = recoveringObservable.toList().toBlocking().first();
 
         assertFalse(cachedResults.isEmpty());
         assertEquals(results.size(), cachedResults.size());
