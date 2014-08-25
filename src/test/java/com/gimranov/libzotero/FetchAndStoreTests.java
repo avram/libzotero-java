@@ -23,11 +23,13 @@ import com.gimranov.libzotero.model.Item;
 import com.gimranov.libzotero.persist.PersistenceAction;
 import com.gimranov.libzotero.rx.FlattenIteratorFunc;
 import com.gimranov.libzotero.rx.PersistenceLoadFunc;
+import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.observables.BlockingObservable;
 
@@ -49,15 +51,16 @@ public class FetchAndStoreTests {
         RequestInterceptor authorizingInterceptor = new RequestInterceptor() {
             @Override
             public void intercept(RequestFacade request) {
-                request.addEncodedQueryParam("key", ACCESS_KEY);
-                request.addHeader("Zotero-API-Version", "2");
+                request.addHeader(HttpHeaders.AUTHORIZATION, HttpHeaders.AUTHORIZATION_BEARER_X + ACCESS_KEY);
+                request.addHeader(HttpHeaders.ZOTERO_API_VERSION, "3");
             }
         };
 
         RestAdapter adapter = new RestAdapter.Builder()
                 .setEndpoint("https://api.zotero.org")
                 .setRequestInterceptor(authorizingInterceptor)
-                .setConverter(new ZoteroConverter())
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setConverter(new GsonConverter(new Gson()))
                 .build();
 
         zoteroService = adapter.create(ZoteroService.class);
@@ -79,9 +82,9 @@ public class FetchAndStoreTests {
         List<Item> results = BlockingObservable.from(cachingObservable).first();
 
         assertTrue(!results.isEmpty());
-        Item persisted = BlockingObservable.from(persistence.load(results.get(0).getItemKey(), Item.class)).first();
+        Item persisted = BlockingObservable.from(persistence.load(results.get(0).getKey(), Item.class)).first();
         assertNotNull(persisted);
-        assertEquals(results.get(0).getItemKey(), persisted.getItemKey());
+        assertEquals(results.get(0).getKey(), persisted.getKey());
     }
 
     @Test

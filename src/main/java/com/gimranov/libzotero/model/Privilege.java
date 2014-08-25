@@ -19,9 +19,6 @@
 
 package com.gimranov.libzotero.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Privilege {
 
     private boolean library;
@@ -29,46 +26,19 @@ public class Privilege {
     private boolean notes;
     private boolean write;
 
-    private Map<String, Boolean> groupAccess = new HashMap<>();
-
     public boolean hasLibrary() {
         return library;
     }
 
-    public void setLibrary(boolean library) {
-        this.library = library;
-    }
-
-    public boolean isFiles() {
+    public boolean hasFiles() {
         return files;
     }
 
-    public void setFiles(boolean files) {
-        this.files = files;
-    }
-
-    public boolean isNotes() {
+    public boolean hasNotes() {
         return notes;
     }
 
-    public void setNotes(boolean notes) {
-        this.notes = notes;
-    }
-
-    public boolean isWrite() {
+    public boolean hasWrite() {
         return write;
-    }
-
-    public void setWrite(boolean write) {
-        this.write = write;
-    }
-
-    public void setGroupAccess(String groupKey, boolean hasWriteAccess) {
-        groupAccess.put(groupKey, hasWriteAccess);
-    }
-
-    public boolean hasGroupAccess(String groupKey) {
-        Boolean access = groupAccess.get(groupKey);
-        return access == null ? false : access;
     }
 }

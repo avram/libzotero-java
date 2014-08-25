@@ -22,9 +22,10 @@ package com.gimranov.libzotero;
 import com.gimranov.libzotero.model.Collection;
 import com.gimranov.libzotero.model.Group;
 import com.gimranov.libzotero.model.Item;
+import com.gimranov.libzotero.model.Key;
 import com.gimranov.libzotero.model.ObjectVersions;
-import com.gimranov.libzotero.model.Privilege;
 import com.gimranov.libzotero.model.Search;
+import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 import retrofit.RequestInterceptor;
@@ -32,6 +33,7 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Header;
 import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.observables.BlockingObservable;
@@ -54,15 +56,16 @@ public class ServiceTests {
         RequestInterceptor authorizingInterceptor = new RequestInterceptor() {
             @Override
             public void intercept(RequestFacade request) {
-                request.addEncodedQueryParam("key", ACCESS_KEY);
-                request.addHeader("Zotero-API-Version", "2");
+                request.addHeader(HttpHeaders.AUTHORIZATION, HttpHeaders.AUTHORIZATION_BEARER_X + ACCESS_KEY);
+                request.addHeader(HttpHeaders.ZOTERO_API_VERSION, "3");
             }
         };
 
         RestAdapter adapter = new RestAdapter.Builder()
                 .setEndpoint("https://api.zotero.org")
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setRequestInterceptor(authorizingInterceptor)
-                .setConverter(new ZoteroConverter())
+                .setConverter(new GsonConverter(new Gson()))
                 .build();
 
         zoteroService = adapter.create(ZoteroService.class);
@@ -136,16 +139,16 @@ public class ServiceTests {
     public void testSingleItem() throws Exception {
         rx.Observable<Item> itemObservable = zoteroService.getItem(LibraryType.USER, USER_ID, "EVZNKA2M", null);
         Item bill = BlockingObservable.from(itemObservable).first();
-        assertEquals(1, bill.getItemVersion());
-        assertEquals("journalArticle", bill.getItemType());
+        assertEquals(1, bill.getVersion());
+        assertEquals("journalArticle", bill.getData().getItemType());
     }
 
     @Test
     public void testSingleItem304() throws Exception {
         rx.Observable<Item> itemObservable = zoteroService.getItem(LibraryType.USER, USER_ID, "EVZNKA2M", "1");
         Item bill = BlockingObservable.from(itemObservable).first();
-        assertEquals(1, bill.getItemVersion());
-        assertEquals("journalArticle", bill.getItemType());
+        assertEquals(1, bill.getVersion());
+        assertEquals("journalArticle", bill.getData().getItemType());
     }
 
     @Test
@@ -157,12 +160,12 @@ public class ServiceTests {
     }
 
     @Test
-    public void testPrivileges() throws Exception {
-        rx.Observable<Privilege> privilegeObservable = zoteroService.getPrivileges(USER_ID, ACCESS_KEY);
+    public void testKeyPrivileges() throws Exception {
+        rx.Observable<Key> privilegeObservable = zoteroService.getPrivileges(USER_ID, ACCESS_KEY);
 
-        Privilege privileges = BlockingObservable.from(privilegeObservable).first();
+        Key key = BlockingObservable.from(privilegeObservable).first();
 
-        assertTrue(privileges.hasLibrary());
+        assertTrue(key.getAccess().getUser().hasLibrary());
 
     }
 
@@ -178,7 +181,7 @@ public class ServiceTests {
                 .filter(new Func1<Header, Boolean>() {
                     @Override
                     public Boolean call(Header header) {
-                        return "Last-Modified-Version".equalsIgnoreCase(header.getName());
+                        return HttpHeaders.LAST_MODIFIED_VERSION.equalsIgnoreCase(header.getName());
                     }
                 })
                 .map(new Func1<Header, Integer>() {

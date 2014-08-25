@@ -19,7 +19,7 @@
 
 package com.gimranov.libzotero;
 
-import com.gimranov.libzotero.model.Item;
+import com.gimranov.libzotero.model.ItemData;
 import com.gimranov.libzotero.persist.IPersistence;
 import com.gimranov.libzotero.persist.ItemNotFoundException;
 import org.junit.Before;
@@ -40,15 +40,15 @@ public class PersistenceTests {
 
     @Test
     public void testWriteAndRead() throws Exception {
-        persistence.persist("ABC", new Item());
+        persistence.persist("ABC", new ItemData());
 
-        assertNotNull(BlockingObservable.from(persistence.load("ABC", Item.class)).first());
+        assertNotNull(BlockingObservable.from(persistence.load("ABC", ItemData.class)).first());
     }
 
     @Test
     public void testNonexistentItem() throws Exception {
         try {
-            BlockingObservable.from(persistence.load("A", Item.class)).first();
+            BlockingObservable.from(persistence.load("A", ItemData.class)).first();
         } catch (RuntimeException e) {
             assertTrue(e.getCause() instanceof ItemNotFoundException);
             return;
